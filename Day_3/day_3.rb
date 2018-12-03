@@ -13,19 +13,40 @@ end
 def populate_fabric input, fabric
   input.each_line do |claim|
     claim_array = claim.split(/[#@:,x]/)
+    id = claim_array[1].strip
     column = claim_array[2].strip.to_i
     row = claim_array[3].strip.to_i
     width = claim_array[4].strip.to_i
     height = claim_array[5].strip.to_i
     height.times do |i|
       width.times do |j|
-        if fabric[column + j][row + i] == '1'
+        if fabric[column + j][row + i] == '.'
+          fabric[column + j][row + i] = id
+        else
           fabric[column + j][row + i] = 'X'
-        elsif fabric[column + j][row + i] == '.'
-          fabric[column + j][row + i] = '1'
         end
       end
     end
+  end
+end
+
+def intact_claim input, fabric
+  input.each_line do |claim|
+    intact = true
+    claim_array = claim.split(/[#@:,x]/)
+    id = claim_array[1].strip
+    column = claim_array[2].strip.to_i
+    row = claim_array[3].strip.to_i
+    width = claim_array[4].strip.to_i
+    height = claim_array[5].strip.to_i
+    height.times do |i|
+      width.times do |j|
+        if fabric[column + j][row + i] != id
+          intact = false
+        end
+      end
+    end
+    return id if intact
   end
 end
 
@@ -44,4 +65,6 @@ end
 fabric = create_fabric $inches
 input = File.read('input.txt')
 populate_fabric input, fabric
-puts overlaps_count fabric
+puts "Part one solution: #{overlaps_count fabric}"
+true_claim = intact_claim(input, fabric)
+puts "Part two solution: #{true_claim}"
